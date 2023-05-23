@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import {
   VscChevronRight,
@@ -14,6 +14,7 @@ import { stopPropagation } from "./utils";
 import { ActionButton } from "./action-button";
 import { Node } from "./node";
 import { NewItemForm, NewItemFormRef } from "./new-item-form";
+import { DropZone } from "./drop-zone";
 
 export type DirectoryProps = {
   data: DirectoryNode;
@@ -22,7 +23,9 @@ export type DirectoryProps = {
   setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   parentPath?: string[];
   onClick: (path: string[]) => void;
+  onMove: (destinationPath: string[]) => void;
   onCreate: (parentPath: string[], node: TreeNode) => void;
+  updateDragImage: (e: React.DragEvent) => void;
   actions?: React.ReactNode;
   className?: string;
 };
@@ -34,7 +37,9 @@ export const Directory = ({
   setSelected,
   parentPath,
   onClick,
+  onMove,
   onCreate,
+  updateDragImage,
   actions,
   className,
 }: DirectoryProps) => {
@@ -59,6 +64,22 @@ export const Directory = ({
     [data, setData]
   );
 
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      stopPropagation(e);
+      selectThis();
+      onClick(currentPath);
+      updateDragImage(e);
+    },
+    [currentPath, onClick, selectThis, updateDragImage]
+  );
+
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleDrop = useCallback(() => {
+    onMove(currentPath);
+  }, [currentPath, onMove]);
+
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       stopPropagation(e);
@@ -81,7 +102,11 @@ export const Directory = ({
   );
 
   return (
-    <div className={className}>
+    <DropZone
+      className={clsx({ "bg-gray-300": dragOver }, className)}
+      onDragOver={setDragOver}
+      onDrop={handleDrop}
+    >
       <Node
         data={data}
         isSelected={isSelected}
@@ -106,6 +131,7 @@ export const Directory = ({
           </>
         }
         onClick={handleClick}
+        onDragStart={handleDragStart}
       />
 
       <div
@@ -129,6 +155,7 @@ export const Directory = ({
                 data={item}
                 parentPath={currentPath}
                 onClick={onClick}
+                onMove={onMove}
                 onCreate={onCreate}
                 setData={(state) => {
                   setData({
@@ -140,6 +167,7 @@ export const Directory = ({
                 }}
                 selected={selected}
                 setSelected={setSelected}
+                updateDragImage={updateDragImage}
                 className={className}
               />
             ) : (
@@ -150,11 +178,12 @@ export const Directory = ({
                 selected={selected}
                 setSelected={setSelected}
                 onClick={onClick}
+                updateDragImage={updateDragImage}
               />
             )
           )}
         </div>
       </div>
-    </div>
+    </DropZone>
   );
 };

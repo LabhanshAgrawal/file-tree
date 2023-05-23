@@ -1,5 +1,5 @@
 import React from "react";
-import { TreeNode } from "./types";
+import { DirectoryNode, TreeNode } from "./types";
 
 export const stopPropagation = (event: React.MouseEvent) => {
   event.stopPropagation();
@@ -22,4 +22,23 @@ export const findNode = (
     const found = findNode(child, rest);
     return found ? [found] : [];
   })[0];
+};
+
+export const extractNode = (
+  node: DirectoryNode,
+  path: string[]
+): TreeNode | undefined => {
+  const parentPath = [...path];
+  const name = parentPath.pop();
+  const parentNode = findNode(node, parentPath);
+
+  if (parentNode?.kind === "directory") {
+    const index = parentNode.children.findIndex((child) => child.name === name);
+
+    if (index === -1) {
+      return;
+    }
+
+    return parentNode.children.splice(index, 1)[0];
+  }
 };

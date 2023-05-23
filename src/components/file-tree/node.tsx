@@ -8,6 +8,7 @@ export type NodeProps = {
   icon: React.ReactNode;
   actions?: React.ReactNode;
   onClick: (e: React.MouseEvent) => void;
+  onDragStart: (e: React.DragEvent) => void;
   className?: string;
 };
 
@@ -17,10 +18,13 @@ export const Node = ({
   icon,
   actions,
   onClick,
+  onDragStart,
   className,
 }: NodeProps) => (
   <div
+    draggable
     onClick={onClick}
+    onDragStart={onDragStart}
     className={clsx(
       "cursor-pointer leading-4 select-none",
       "flex h-7 items-center justify-between hover:bg-gray-300 group",

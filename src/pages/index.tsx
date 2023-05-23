@@ -3,6 +3,7 @@ import {
   TreeNode,
   DirectoryNode,
   findNode,
+  extractNode,
 } from "@/components/file-tree";
 import { Inter } from "next/font/google";
 import { useCallback, useState } from "react";
@@ -17,6 +18,26 @@ export default function Home() {
     initialState.expanded = true;
     return initialState;
   });
+
+  const onMove = useCallback(
+    (sourcePath: string[], destinationDirPath: string[]) => {
+      const newState = cloneDeep(treeState);
+      const dest = findNode(newState, destinationDirPath);
+
+      if (dest?.kind === "directory") {
+        const node = extractNode(newState, sourcePath);
+        if (node) {
+          dest.expanded = true;
+          dest.children.push(node);
+          setTreeState(newState);
+          return node;
+        }
+      }
+
+      return null;
+    },
+    [treeState]
+  );
 
   const onCreate = useCallback(
     (parentPath: string[], node: TreeNode) => {
@@ -45,6 +66,7 @@ export default function Home() {
         className="w-96 min-w-min border-2 border-solid border-gray-300 rounded p-4"
         treeState={treeState}
         setTreeState={setTreeState}
+        onMove={onMove}
         onCreate={onCreate}
         onClick={(path) => setSelected(path)}
       />

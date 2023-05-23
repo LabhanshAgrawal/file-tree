@@ -11,6 +11,7 @@ export type FileProps = {
   selected: { path: string[]; node?: TreeNode };
   setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   onClick: (path: string[]) => void;
+  updateDragImage: (e: React.DragEvent) => void;
   actions?: React.ReactNode;
   className?: string;
 };
@@ -21,6 +22,7 @@ export const File = ({
   selected,
   setSelected,
   onClick,
+  updateDragImage,
   actions,
   className,
 }: FileProps) => {
@@ -47,6 +49,13 @@ export const File = ({
     [currentPath, onClick, selectThis]
   );
 
+  const handleDragStart = (e: React.DragEvent) => {
+    stopPropagation(e);
+    selectThis();
+    onClick(currentPath);
+    updateDragImage(e);
+  };
+
   return (
     <Node
       data={data}
@@ -54,6 +63,7 @@ export const File = ({
       icon={<VscFile />}
       actions={actions}
       onClick={handleClick}
+      onDragStart={handleDragStart}
       className={className}
     />
   );
