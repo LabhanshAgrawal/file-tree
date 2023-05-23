@@ -13,6 +13,12 @@ export const DropZone = ({
   onDrop,
   children,
 }: React.PropsWithChildren<DropZoneProps>) => {
+  /**
+   * We keep a counter to determine if the mouse is within the parent element
+   * or its children. This approach is more reliable than using dragenter and
+   * dragleave events directly, which can be triggered by child elements and
+   * cause flickering, or the dragover event, which fires continuously.
+   */
   const dragCounterRef = useRef(0);
   const setDragCounter = useCallback(
     (value: number) => {

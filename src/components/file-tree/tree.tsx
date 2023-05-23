@@ -94,6 +94,9 @@ export const FileTree = ({
     [setTreeState, treeState]
   );
 
+  /**
+   * Drag preview used when dragging a file or directory.
+   */
   const dragImageRef = React.useRef<HTMLDivElement>(null);
 
   const updateDragImage = useCallback(
