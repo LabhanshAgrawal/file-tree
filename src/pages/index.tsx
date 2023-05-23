@@ -1,6 +1,11 @@
-import { FileTree, DirectoryNode } from "@/components/file-tree";
+import {
+  FileTree,
+  TreeNode,
+  DirectoryNode,
+  findNode,
+} from "@/components/file-tree";
 import { Inter } from "next/font/google";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { cloneDeep } from "lodash";
 import { sampleData } from "@/utils";
 
@@ -13,6 +18,23 @@ export default function Home() {
     return initialState;
   });
 
+  const onCreate = useCallback(
+    (parentPath: string[], node: TreeNode) => {
+      const newState = cloneDeep(treeState);
+      const parent = findNode(newState, parentPath);
+
+      if (parent?.kind === "directory") {
+        if (node.kind === "file") node.meta = "0KB";
+        parent.children.push(node);
+        setTreeState(newState);
+        return node;
+      }
+
+      return null;
+    },
+    [treeState]
+  );
+
   const [selected, setSelected] = useState<string[]>();
 
   return (
@@ -23,6 +45,7 @@ export default function Home() {
         className="w-96 min-w-min border-2 border-solid border-gray-300 rounded p-4"
         treeState={treeState}
         setTreeState={setTreeState}
+        onCreate={onCreate}
         onClick={(path) => setSelected(path)}
       />
       {selected && (

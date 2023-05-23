@@ -9,6 +9,7 @@ export type TreeProps = {
   treeState: DirectoryNode;
   setTreeState: (state: DirectoryNode) => void;
   onClick?: (path: string[]) => void;
+  onCreate?: (parentPath: string[], node: TreeNode) => TreeNode | null;
   className?: string;
 };
 
@@ -16,6 +17,7 @@ export const FileTree = ({
   treeState,
   setTreeState,
   onClick,
+  onCreate,
   className,
 }: TreeProps) => {
   const [selected, setSelected] = useState<{
@@ -28,6 +30,17 @@ export const FileTree = ({
       onClick?.(path);
     },
     [onClick]
+  );
+
+  const onNodeCreate = useCallback(
+    (parentPath: string[], node: TreeNode) => {
+      const created = onCreate?.(parentPath, node);
+      if (created) {
+        setSelected({ path: [...parentPath, created.name], node: created });
+        onNodeClick([...parentPath, created.name]);
+      }
+    },
+    [onNodeClick, onCreate]
   );
 
   const expandAllHandler = useCallback(
@@ -59,6 +72,7 @@ export const FileTree = ({
         data={treeState}
         setData={setTreeState}
         onClick={onNodeClick}
+        onCreate={onNodeCreate}
         selected={selected}
         setSelected={setSelected}
         actions={

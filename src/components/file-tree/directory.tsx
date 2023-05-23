@@ -1,12 +1,19 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import clsx from "clsx";
-import { VscChevronRight, VscChevronDown } from "react-icons/vsc";
+import {
+  VscChevronRight,
+  VscChevronDown,
+  VscNewFile,
+  VscNewFolder,
+} from "react-icons/vsc";
 import { DirectoryNode, TreeNode } from "./types";
 import { isEqual, sortBy } from "lodash";
 
 import { File } from "./file";
 import { stopPropagation } from "./utils";
+import { ActionButton } from "./action-button";
 import { Node } from "./node";
+import { NewItemForm, NewItemFormRef } from "./new-item-form";
 
 export type DirectoryProps = {
   data: DirectoryNode;
@@ -15,6 +22,7 @@ export type DirectoryProps = {
   setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   parentPath?: string[];
   onClick: (path: string[]) => void;
+  onCreate: (parentPath: string[], node: TreeNode) => void;
   actions?: React.ReactNode;
   className?: string;
 };
@@ -26,6 +34,7 @@ export const Directory = ({
   setSelected,
   parentPath,
   onClick,
+  onCreate,
   actions,
   className,
 }: DirectoryProps) => {
@@ -60,13 +69,42 @@ export const Directory = ({
     [currentPath, onClick, selectThis, toggleExpand]
   );
 
+  const newItemFormRef = useRef<NewItemFormRef>(null);
+
+  const handleNewItemFormClick = useCallback(
+    (e: React.MouseEvent, kind: TreeNode["kind"]) => {
+      stopPropagation(e);
+      toggleExpand(true);
+      newItemFormRef.current?.open(kind);
+    },
+    [newItemFormRef, toggleExpand]
+  );
+
   return (
     <div className={className}>
       <Node
         data={data}
         isSelected={isSelected}
         icon={data.expanded ? <VscChevronDown /> : <VscChevronRight />}
-        actions={actions}
+        actions={
+          <>
+            <ActionButton
+              onClick={(e) => handleNewItemFormClick(e, "file")}
+              title="New File"
+            >
+              <VscNewFile />
+            </ActionButton>
+
+            <ActionButton
+              onClick={(e) => handleNewItemFormClick(e, "directory")}
+              title="New Folder"
+            >
+              <VscNewFolder />
+            </ActionButton>
+
+            {actions}
+          </>
+        }
         onClick={handleClick}
       />
 
@@ -78,6 +116,12 @@ export const Directory = ({
           <div className="border-x border-solid h-full" />
         </div>
         <div className="flex-1">
+          <NewItemForm
+            currentPath={currentPath}
+            onCreate={onCreate}
+            ref={newItemFormRef}
+          />
+
           {sortBy(sortBy(data.children, "name"), "kind").map((item) =>
             item.kind === "directory" ? (
               <Directory
@@ -85,6 +129,7 @@ export const Directory = ({
                 data={item}
                 parentPath={currentPath}
                 onClick={onClick}
+                onCreate={onCreate}
                 setData={(state) => {
                   setData({
                     ...data,
