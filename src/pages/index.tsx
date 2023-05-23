@@ -4,6 +4,7 @@ import {
   DirectoryNode,
   findNode,
   extractNode,
+  getDirNodeFromHandle,
 } from "@/components/file-tree";
 import { Inter } from "next/font/google";
 import { useCallback, useState } from "react";
@@ -58,10 +59,29 @@ export default function Home() {
 
   const [selected, setSelected] = useState<string[]>();
 
+  const handleOpenLocalFolder = () => {
+    (window as any)
+      .showDirectoryPicker?.()
+      ?.then(async (dir: FileSystemDirectoryHandle) => {
+        const newState = await getDirNodeFromHandle(dir);
+        newState.expanded = true;
+        setTreeState(newState);
+      })
+      ?.catch((err: any) => {
+        console.error(err);
+      });
+  };
+
   return (
     <main
       className={`flex min-h-screen flex-col items-center p-24 ${inter.className}`}
     >
+      <button
+        className="m-4 px-4 py-2 bg-blue-500 text-white rounded"
+        onClick={handleOpenLocalFolder}
+      >
+        Load Local Folder Data
+      </button>
       <FileTree
         className="w-96 min-w-min border-2 border-solid border-gray-300 rounded p-4"
         treeState={treeState}

@@ -3,4 +3,4 @@ export type { TreeProps } from "./tree";
 
 export type { TreeNode, FileNode, DirectoryNode } from "./types";
 
-export { findNode, extractNode } from "./utils";
+export { findNode, extractNode, getDirNodeFromHandle } from "./utils";
