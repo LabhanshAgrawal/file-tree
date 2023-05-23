@@ -11,6 +11,7 @@ export type FileProps = {
   selected: { path: string[]; node?: TreeNode };
   setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   onClick: (path: string[]) => void;
+  actions?: React.ReactNode;
   className?: string;
 };
 
@@ -20,6 +21,7 @@ export const File = ({
   selected,
   setSelected,
   onClick,
+  actions,
   className,
 }: FileProps) => {
   const currentPath = useMemo(
@@ -50,6 +52,7 @@ export const File = ({
       data={data}
       isSelected={isSelected}
       icon={<VscFile />}
+      actions={actions}
       onClick={handleClick}
       className={className}
     />

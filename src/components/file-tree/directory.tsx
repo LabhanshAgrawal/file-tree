@@ -15,6 +15,7 @@ export type DirectoryProps = {
   setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   parentPath?: string[];
   onClick: (path: string[]) => void;
+  actions?: React.ReactNode;
   className?: string;
 };
 
@@ -25,6 +26,7 @@ export const Directory = ({
   setSelected,
   parentPath,
   onClick,
+  actions,
   className,
 }: DirectoryProps) => {
   const currentPath = useMemo(
@@ -64,6 +66,7 @@ export const Directory = ({
         data={data}
         isSelected={isSelected}
         icon={data.expanded ? <VscChevronDown /> : <VscChevronRight />}
+        actions={actions}
         onClick={handleClick}
       />
 
