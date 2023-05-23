@@ -37,6 +37,7 @@ type TreeProps = {
 - The root node is always a directory instead of an array of nodes.
 - Expand all and collapse all buttons are only added to the root node.
 - The `onMove` and `onCreate` functions are passed to the `FileTree` component from the parent component. This is to allow the parent component to handle the move and create operations in a way that makes sense for the parent component. For example, the parent component might want to make an API call to update the data on some server.
+- The `meta` property is used to store any additional text/status that needs to be displayed for a node. In this demo, the `meta` property is used to display only the size of a file.
 
 ### Some improvements that can be made
 
