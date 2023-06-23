@@ -1,31 +1,22 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import { VscFile } from "react-icons/vsc";
 import { FileNode, TreeNode } from "./types";
 import { isEqual } from "lodash";
 import { stopPropagation } from "./utils";
 import { Node } from "./node";
+import { useFileTreeContext } from "./context";
 
 export type FileProps = {
   data: FileNode;
   parentPath?: string[];
-  selected: { path: string[]; node?: TreeNode };
-  setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
-  onClick: (path: string[]) => void;
-  updateDragImage: (e: React.DragEvent) => void;
   actions?: React.ReactNode;
   className?: string;
 };
 
-export const File = ({
-  data,
-  parentPath,
-  selected,
-  setSelected,
-  onClick,
-  updateDragImage,
-  actions,
-  className,
-}: FileProps) => {
+export const File = ({ data, parentPath, actions, className }: FileProps) => {
+  const { updateDragImage, selected, setSelected, onClick } =
+    useFileTreeContext();
+
   const currentPath = useMemo(
     () => [...(parentPath || []), data.name],
     [data.name, parentPath]

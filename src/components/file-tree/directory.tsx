@@ -15,17 +15,12 @@ import { ActionButton } from "./action-button";
 import { Node } from "./node";
 import { NewItemForm, NewItemFormRef } from "./new-item-form";
 import { DropZone } from "./drop-zone";
+import { useFileTreeContext } from "./context";
 
 export type DirectoryProps = {
   data: DirectoryNode;
   setData: (state: DirectoryNode) => void;
-  selected: { path: string[]; node?: TreeNode };
-  setSelected: (selected: { path: string[]; node?: TreeNode }) => void;
   parentPath?: string[];
-  onClick: (path: string[]) => void;
-  onMove: (destinationPath: string[]) => void;
-  onCreate: (parentPath: string[], node: TreeNode) => void;
-  updateDragImage: (e: React.DragEvent) => void;
   actions?: React.ReactNode;
   className?: string;
 };
@@ -33,16 +28,13 @@ export type DirectoryProps = {
 export const Directory = ({
   data,
   setData,
-  selected,
-  setSelected,
   parentPath,
-  onClick,
-  onMove,
-  onCreate,
-  updateDragImage,
   actions,
   className,
 }: DirectoryProps) => {
+  const { updateDragImage, selected, setSelected, onClick, onCreate, onMove } =
+    useFileTreeContext();
+
   const currentPath = useMemo(
     () => [...(parentPath || []), data.name],
     [data.name, parentPath]
@@ -154,9 +146,6 @@ export const Directory = ({
                 key={item.name}
                 data={item}
                 parentPath={currentPath}
-                onClick={onClick}
-                onMove={onMove}
-                onCreate={onCreate}
                 setData={(state) => {
                   setData({
                     ...data,
@@ -165,21 +154,10 @@ export const Directory = ({
                     ),
                   });
                 }}
-                selected={selected}
-                setSelected={setSelected}
-                updateDragImage={updateDragImage}
                 className={className}
               />
             ) : (
-              <File
-                key={item.name}
-                data={item}
-                parentPath={currentPath}
-                selected={selected}
-                setSelected={setSelected}
-                onClick={onClick}
-                updateDragImage={updateDragImage}
-              />
+              <File key={item.name} data={item} parentPath={currentPath} />
             )
           )}
         </div>

@@ -13,3 +13,12 @@ export type FileNode = {
 };
 
 export type TreeNode = DirectoryNode | FileNode;
+
+export type InteractionHandlers = {
+  onClick?: (path: string[]) => void;
+  onMove?: (
+    sourcePath: string[],
+    destinationDirPath: string[]
+  ) => TreeNode | null;
+  onCreate?: (parentPath: string[], node: TreeNode) => TreeNode | null;
+};
